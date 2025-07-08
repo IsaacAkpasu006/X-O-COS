@@ -114,5 +114,111 @@ public class TicTacToeGUI extends JFrame implements ActionListener {
         }
     }
 
-    // Handles button clicks
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (gameEnded) {
+            return;
+        }
+
+        JButton clickedButton = (JButton) e.getSource();
+        String[] coords = clickedButton.getActionCommand().split(",");
+        int row = Integer.parseInt(coords[0]);
+        int col = Integer.parseInt(coords[1]);
+
+        if (board[row][col] == ' ') { // Check if the spot is empty
+            board[row][col] = currentPlayer;
+            clickedButton.setText(String.valueOf(currentPlayer));
+            movesMade++;
+
+            if (checkWin()) {
+                statusLabel.setText(getPlayerName(currentPlayer) + " wins!");
+                new WinnerDialog(this, getPlayerName(currentPlayer), this::resetGame);
+                gameEnded = true;
+                disableAllButtons();
+            } else if (movesMade == 9) {
+                statusLabel.setText("It's a draw!");
+                gameEnded = true;
+            } else {
+                switchPlayer();
+                statusLabel.setText(getPlayerName(currentPlayer) + "'s turn");
+            }
+        } else {
+            statusLabel.setText("Invalid move! Try again, " + getPlayerName(currentPlayer) + ".");
+        }
+    }
+
+
+
+    private boolean checkWin() {
+        return (checkRows() || checkColumns() || checkDiagonals());
+    }
+
+    private boolean checkRows() {
+        for (int i = 0; i < 3; i++) {
+            if (board[i][0] == currentPlayer && board[i][1] == currentPlayer && board[i][2] == currentPlayer) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkColumns() {
+        for (int j = 0; j < 3; j++) {
+            if (board[0][j] == currentPlayer && board[1][j] == currentPlayer && board[2][j] == currentPlayer) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean checkDiagonals() {
+        if (board[0][0] == currentPlayer && board[1][1] == currentPlayer && board[2][2] == currentPlayer) {
+            return true;
+        }
+        if (board[0][2] == currentPlayer && board[1][1] == currentPlayer && board[2][0] == currentPlayer) {
+            return true;
+        }
+        return false;
+    }
+
+    private void switchPlayer() {
+        currentPlayer = (currentPlayer == 'X') ? 'O' : 'X';
+    }
+
+    private void disableAllButtons() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                buttons[i][j].setEnabled(false);
+            }
+        }
+    }
+
+    private void enableAllButtons() {
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                buttons[i][j].setEnabled(true);
+            }
+        }
+    }
+
+    private void resetGame() {
+        initializeBoardLogic();
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                buttons[i][j].setText("");
+            }
+        }
+        enableAllButtons();
+        currentPlayer = 'X';
+        gameEnded = false;
+        movesMade = 0;
+        statusLabel.setText(getPlayerName(currentPlayer) + "'s turn");
+    }
+
+
+
+
+}
+
+    
     
